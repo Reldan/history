@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+
+
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+
+    <link href="./nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+
+    <style>
+
+body {
+  overflow-y:scroll;
+}
+
+text {
+  font: 12px sans-serif;
+}
+
+</style>
+    <!-- <link href="nv.d3.css"/> -->
+
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
+     -->
+
+
+    <script src="./nvd3/lib/d3.v2.js"></script>
+    <script src="./nvd3/nv.d3.js"></script>
+    <script src="./nvd3/src/utils.js"></script>
+    <script src="./nvd3/src/tooltip.js"></script>
+    <script src="./nvd3/src/models/stackedArea.js"></script>
+    <script src="pareseUri.js"></script>
+    <script src="popup.js"></script>
+    <script src="underscore.js"></script>
+  </head>
+
+  <body>
+    <div id="chart">
+      <svg></svg>
+    </div>
+  </body>
+</html>
+
