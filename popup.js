@@ -16,7 +16,7 @@ function prepareData(urls) {
   var res = _.groupBy(n, function(el){ return el })
   var nRes = _.map(res, function(t) {console.log(t[0]); return {"label": t[0], "value": t.length}})
   nRes = _.sortBy(nRes, function(el) { return el.value })
-  nRes = _.filter(nRes, function(el) {return el.value > 50})
+  nRes = _.filter(nRes, function(el) {return el.value > 80})
   console.log(nRes)
   viz([{key: "VizData", values: nRes}])
 }
@@ -26,7 +26,7 @@ chrome.history.search({text: "", maxResults: 0, startTime: 0}, prepareData)
 
 
 function viz(data) {
-  nv.addGraph(function() {
+  nv.addGraph({generate: function() {
     var chart = nv.models.discreteBarChart()
         .x(function(d) { return d.label })
         .y(function(d) { return d.value })
@@ -36,14 +36,42 @@ function viz(data) {
   
     d3.select('#chart svg')
        .datum(data)
-     .transition().duration(500)
+       .attr('width', 1000)
+       .attr('height', 500)
+       .transition().duration(500)
        .call(chart);
  
    nv.utils.windowResize(chart.update);
  
    return chart;
- });
+ },
+ callback: function(graph) {
 
+  window.onResize = function() {
+      var width = nv.utils.windowSize().width - 20,
+          height = nv.utils.windowSize().height - 20,
+          margin = graph.margin();
+
+
+      if (width < margin.left + margin.right + 20)
+        width = margin.left + margin.right + 20;
+
+      if (height < margin.top + margin.bottom + 20)
+        height = margin.top + margin.bottom + 20;
+
+
+      graph
+         .width(width)
+         .height(height);
+
+      d3.select('#chart svg')
+        .attr('width', width)
+        .attr('height', height)
+        .call(graph);
+
+    }
+  }
+}); 
 }
 
 
