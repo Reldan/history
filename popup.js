@@ -79,6 +79,9 @@ function viz(data) {
 
 
 // Run our kitten generation script as soon as the document's DOM is ready.
-// document.addEventListener('DOMContentLoaded', function () {
-  // viz(prepareData())
-// });
+document.addEventListener('DOMContentLoaded', function () {
+  $('#myTab a').click(function (e) {
+  e.preventDefault();
+    $(this).tab('show');
+  })
+});
