@@ -1,29 +1,84 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+function mills2weeks(mil) {
+  var seconds = (mil / 1000) | 0;
+  mil -= seconds * 1000;
 
-/**
- * Global variable containing the query we'd like to pass to Flickr. In this
- * case, kittens!
- *
- * @type {string}
- */
+  var minutes = (seconds / 60) | 0;
+  seconds -= minutes * 60;
 
-function prepareData(urls) {
-  console.log(urls)
-  var n = _.map(urls, function(el) { 
-    return parseUri(el.url).authority })
-  var res = _.groupBy(n, function(el){ return el })
-  var nRes = _.map(res, function(t) {console.log(t[0]); return {"label": t[0], "value": t.length}})
-  nRes = _.sortBy(nRes, function(el) { return el.value })
-  nRes = _.filter(nRes, function(el) {return el.value > 80})
-  console.log(nRes)
-  viz([{key: "VizData", values: nRes}])
+  var hours = (minutes / 60) | 0;
+  minutes -= hours * 60;
+
+  var days = (hours / 24) | 0;
+  hours -= days * 24;
+
+  var weeks = (days / 7) | 0;
+  days -= weeks * 7;
+
+  return weeks;
+}
+
+function objectToList(p) {
+  var arr = []
+  for (var key in p) {
+    if (p.hasOwnProperty(key)) {
+      arr.push([parseInt(key), p[key]]);
+    }
+  }
+  return arr;
 }
 
 
-chrome.history.search({text: "", maxResults: 0, startTime: 0}, prepareData)
+function prepareData(urls) {
+  var n = _.map(urls, function(el) { return parseUri(el.url).authority })
+  var res = _.groupBy(n, function(el){ return el })
+  var res2 = _.groupBy(urls, function(el){ return parseUri(el.url).authority })
+  var nnRes = _.map(res2, function(el) { 
+    var groupped = _.countBy(el, function (elUrl) { return mills2weeks(elUrl.lastVisitTime) } )
+    return {"key": parseUri(el[0].url).authority, "values": objectToList(groupped)}
+  } );
+  console.log(nnRes); // for stackking
+  console.log(JSON.stringify(nnRes)); // for stackking
+  var nRes = _.map(res, function(t) { return {"label": t[0], "value": t.length}});
+  nRes = _.sortBy(nRes, function(el) { return el.value });
+  nRes = _.filter(nRes, function(el) { return el.value > 80 });
+  viz([{key: "VizData", values: nRes}]);
+  viz2(nnRes);
+}
 
+
+function viz2(data) {
+  console.log("vix")
+  // var colors = d3.scale.category20();
+  // keyColor = function(d, i) {return colors(d.key)};
+  var histcatexplong = [{"key": "key 1", "values": [[1, 5], [2, 25], [3, 45]]},
+                        {"key": "key 2", "values": [[1, 15],[2, 7],  [3, 0]]}];
+
+  var chart2;
+  nv.addGraph(function() {
+    chart2 = nv.models.stackedAreaChart()
+                 // .width(600).height(500)
+                  // .useInteractiveGuideline(true)
+                  .x(function(d) { return d[0] })
+                  .y(function(d) { return d[1] })
+                  // .color(keyColor)
+                  .transitionDuration(300);
+                  //.clipEdge(true);
+
+  // chart.stacked.scatter.clipVoronoi(false);
+
+    d3.select('#chart2 svg')
+      .datum(histcatexplong)
+      .transition().duration(0)
+      .call(chart2);
+
+    nv.utils.windowResize(chart2.update);
+
+    // chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+    console.log("dfsadf")
+    return chart2;
+  });
+
+}
 
 function viz(data) {
   nv.addGraph({generate: function() {
@@ -34,7 +89,7 @@ function viz(data) {
         .tooltips(false)
         .showValues(true)
   
-    d3.select('#chart svg')
+    d3.select('#chart1 svg')
        .datum(data)
        .attr('width', 1000)
        .attr('height', 500)
@@ -64,7 +119,12 @@ function viz(data) {
          .width(width)
          .height(height);
 
-      d3.select('#chart svg')
+      d3.select('#chart1 svg')
+        .attr('width', width)
+        .attr('height', height)
+        .call(graph);
+
+      d3.select('#chart2 svg')
         .attr('width', width)
         .attr('height', height)
         .call(graph);
@@ -75,11 +135,11 @@ function viz(data) {
 }
 
 
-
-
-
-// Run our kitten generation script as soon as the document's DOM is ready.
+// Run script as soon as the document's DOM is ready.
 document.addEventListener('DOMContentLoaded', function () {
+  console.log("hello")
+  chrome.history.search({text: "", maxResults: 0, startTime: 0}, prepareData)
+
   $('#myTab a').click(function (e) {
   e.preventDefault();
     $(this).tab('show');

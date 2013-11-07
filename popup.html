@@ -1,24 +1,30 @@
 <!doctype html>
 <meta charset="utf-8">
 
+<link href="./nvd3/nv.d3.css" rel="stylesheet" type="text/css">
+<link href="./nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
+<link href="./bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+<style>
+
+  body {
+    overflow-y:scroll;
+  }
+
+  text {
+    font: 12px sans-serif;
+  }
+
+  #chart1, #chart2 {
+    height: 500px;
+  }
+
+</style>
 
 <html>
   <head>
     <title>Getting Started Extension's Popup</title>
 
-    <link href="./nvd3/src/nv.d3.css" rel="stylesheet" type="text/css">
-    <link href="./bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <style>
-
-body {
-  overflow-y:scroll;
-}
-
-text {
-  font: 12px sans-serif;
-}
-
-</style>
+    
     <!-- <link href="nv.d3.css"/> -->
 
     <!--
@@ -29,11 +35,17 @@ text {
      -->
 
 
-    <script src="./nvd3/lib/d3.v2.js"></script>
+    <script src="./nvd3/lib/d3.v3.js"></script>
     <script src="./nvd3/nv.d3.js"></script>
     <script src="./nvd3/src/utils.js"></script>
-    <script src="./nvd3/src/tooltip.js"></script>
-    <script src="./nvd3/src/models/stackedArea.js"></script>
+    <!-- // <script src="./nvd3/src/tooltip.js"></script> -->
+    <!-- // <script src="./nvd3/src/models/stackedArea.js"></script> -->
+    <script src="./nvd3/src/models/stackedAreaChart.js"></script>
+    <!-- // <script src="./nvd3/src/models/multiBarChart.js"></script> -->
+    <!-- // <script src="./nvd3/src/models/axis.js"></script> -->
+    <!-- // <script src="./nvd3/src/interactiveLayer.js"></script> -->
+    <!-- // <script src="./nvd3/src/models/legend.js"></script> -->
+    <!-- // <script src="./nvd3/src/models/scatter.js"></script> -->
     <script src="./jquery.js"></script>
     <script src="./bootstrap/js/bootstrap.js"></script>
     <script src="pareseUri.js"></script>
@@ -42,6 +54,8 @@ text {
   </head>
 
   <body>
+  
+  
   <ul id="myTab" class="nav nav-tabs">
     <li class="active">
       <a href="#top">Top</a>
@@ -50,15 +64,19 @@ text {
     <li><a href="#">...</a></li>
   </ul>
   <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="top">
+      <div id="chart1">
+        <svg></svg>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="stack">
       <div class="tab-pane fade active in" id="top">
-        <div id="chart">
+        <div id="chart2">
           <svg></svg>
         </div>
       </div>
-      <div class="tab-pane fade" id="stack">
-        <p>Here will be a garden city</p>
-      </div>
     </div>
+  </div>
     
   </body>
 </html>
