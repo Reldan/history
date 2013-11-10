@@ -1,17 +1,46 @@
-# Copyright (c) 2012 The Chromium Authors. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
 
-###
-Global variable containing the query we'd like to pass to Flickr. In this
-case, kittens!
 
-@type {string}
-###
+mills2weeks = (mil) ->
+  seconds = (mil / 1000) | 0
+  mil -= seconds * 1000
+  minutes = (seconds / 60) | 0
+  seconds -= minutes * 60
+  hours = (minutes / 60) | 0
+  minutes -= hours * 60
+  days = (hours / 24) | 0
+  hours -= days * 24
+  weeks = (days / 7) | 0
+  days -= weeks * 7
+  return weeks
+
+
+
+objectToList = (p) ->
+  arr = []
+  for key of p
+    if (p.hasOwnProperty(key))
+      arr.push([parseInt(key), p[key]])
+  return arr
+
 prepareData = (urls) ->
   console.log urls
   n = _.map urls, (el) -> parseUri(el.url).authority
   res = _.groupBy n, (el) -> el
+  res2 = _.groupBy urls, (el) -> parseUri(el.url).authority
+  allWeeks = []
+  nnRes = _.map res2, (el) ->
+    groupped = _.countBy el, (elUrl) ->
+      week = mills2weeks(elUrl.lastVisitTime)
+      allWeeks[week] = week
+      week
+    key: parseUri(el[0].url).authority
+    values: objectToList(groupped)
+  nnRes = _.map res2, (el) ->
+    groupped = _.countBy el, (elUrl) ->
+      mills2weeks(elUrl.lastVisitTime)
+    _.each allWeeks, (el) -> groupped[el] = 0 if (_.isUndefined(groupped[el]))
+    key: parseUri(el[0].url).authority
+    values: objectToList(groupped)
   nRes = _.map res, (t) ->
     console.log t[0]
     label: t[0]
@@ -23,6 +52,21 @@ prepareData = (urls) ->
     key: 'VizData'
     values: nRes
   ]
+  viz2(nnRes)
+
+viz2 = (data) ->
+  chart2
+  nv.addGraph
+    generate: ->
+      chart2 = nv.models.stackedArea().x((d) ->
+        d[0]
+      ).y((d) ->
+        d[1]
+      )
+      d3.select('#chart2 svg').datum(data).call(chart2)
+      nv.utils.windowResize(chart2.update)
+      chart2
+
 
 viz = (data) ->
   nv.addGraph
