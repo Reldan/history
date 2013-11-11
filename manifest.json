@@ -1,8 +1,8 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
-  "name": "One-click Kittens",
-  "description": "This extension demonstrates a browser action with kittens.",
+  "name": "History Analytics",
+  "description": "This extension visualize your history. And can tell much about you.",
   "version": "1.0",
 
   "permissions": [

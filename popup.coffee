@@ -1,5 +1,3 @@
-
-
 mills2weeks = (mil) ->
   seconds = (mil / 1000) | 0
   mil -= seconds * 1000
@@ -13,28 +11,50 @@ mills2weeks = (mil) ->
   days -= weeks * 7
   return weeks
 
-
-
 objectToList = (p) ->
   arr = []
-  for key of p
-    if (p.hasOwnProperty(key))
-      arr.push([parseInt(key), p[key]])
-  return arr
+  for key, value of p
+    arr.push([parseInt(key), value])
+  arr
+
+allVisits = []
+processedItems = 0
+allCount = 0
+
+fetchVisits = (historyItem) ->
+  chrome.history.getVisits(historyItem, (visits) ->
+    console.log(visits)
+    historyItem.visits = _.map visits, (el) -> el.visitTime
+    allVisits.push(historyItem)
+    processedItems++
+    drawGraph() if processedItems == allCount
+  )
+#
+#saveVisits = (visits) ->
+#  console.log(visits)
+#  _.each visits, (visit) -> allVisits.push(visit)
+#  processedItems++
+#  drawGraph() if processedItems == allCount
+
+drawGraph = () ->
+  console.log("draw")
+  json = JSON.stringify(allVisits)
+  console.log(json)
+  $("#json-text").text(json)
 
 prepareData = (urls) ->
-  console.log urls
+  allCount = urls.length
+  _.each(urls, (url) -> fetchVisits(url: url.url))
+
   n = _.map urls, (el) -> parseUri(el.url).authority
   res = _.groupBy n, (el) -> el
   res2 = _.groupBy urls, (el) -> parseUri(el.url).authority
   allWeeks = []
-  nnRes = _.map res2, (el) ->
-    groupped = _.countBy el, (elUrl) ->
+  nnRes = _.each res2, (el) ->
+    _.each el, (elUrl) ->
       week = mills2weeks(elUrl.lastVisitTime)
       allWeeks[week] = week
-      week
-    key: parseUri(el[0].url).authority
-    values: objectToList(groupped)
+
   nnRes = _.map res2, (el) ->
     groupped = _.countBy el, (elUrl) ->
       mills2weeks(elUrl.lastVisitTime)
